@@ -24,6 +24,7 @@ def get_secret():
     
     return secret.replace('"','')
     
+ 
 def file_exists(bucketName,path):
     s3_client = boto3.client('s3')
     result = s3_client.list_objects_v2(Bucket=bucketName, Prefix=path)
@@ -35,7 +36,7 @@ def file_exists(bucketName,path):
 
 def ingest(x,y):
     
-    bucket_name = 'sf-landing-oua'
+    bucket_name = 'landing'
     today = dt.date.today()
     year = today.year
     month = today.month
