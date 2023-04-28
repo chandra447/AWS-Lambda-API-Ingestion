@@ -5,7 +5,7 @@ Parameters:
     NoEcho: true
     Description: API secret
     Type: String
-
+  
 
 #Define the Required Resources
 #1.Creating the required S3 Bucket
@@ -44,8 +44,8 @@ Resources:
             - s3:List*
             Effect: Allow
             Resource:
-              - arn:aws:s3:::landing
-              - arn:aws:s3:::landing/*
+              - arn:aws:s3:::staging-bucket-foundary
+              - arn:aws:s3:::staging-bucket-foundary/*
           Version: '2012-10-17'
         PolicyName: AWSLambda-S3-Access
       - PolicyDocument:
@@ -72,7 +72,6 @@ Resources:
     Properties:
       Description: API key to access ingestion data
       Name: "apiKey"
-      #{"rapidKey":"4cf5e99290mshec3101ac8d0e536p106871jsn5fd1464698a7"}
       SecretString: !Join ["", ["{\"","rapidapiKey",  "\":","\"",!Ref apiKey,"\"}"]]
   
   Lambda:
