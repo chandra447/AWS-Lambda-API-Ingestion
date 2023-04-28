@@ -78,7 +78,7 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Description: "Function to ingest data from api"
-      FunctionName: IngestionAPI
+      FunctionName: IngestionAPITest56
       Handler: function.ingest
       Code: 
         ZipFile: |
