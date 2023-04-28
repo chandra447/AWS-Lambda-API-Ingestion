@@ -36,7 +36,7 @@ def file_exists(bucketName,path):
 
 def ingest(x,y):
     
-    bucket_name = 'ingest-bucket-foundary'
+    bucket_name = 'apiKeyIngest-foundary-prd'
     today = dt.date.today()
     year = today.year
     month = today.month

@@ -6,12 +6,16 @@ Parameters:
     Description: API secret
     Type: String
 
-
 #Define the Required Resources
 #1.Creating the required S3 Bucket
 Resources:            
     #aws lambda role to access s3 bucket and secrets
-  IAMRole:
+  IngestS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: ingest-bucket-foundary-prd
+
+  MyLambdaFunctionRoleFoundaryPrd:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -42,12 +46,14 @@ Resources:
             - s3:PutObject
             - s3:DeleteObject
             - s3:List*
+            - s3:GetObject
             Effect: Allow
             Resource:
-              - arn:aws:s3:::landing
-              - arn:aws:s3:::landing/*
+              - !Sub "arn:aws:s3:::${IngestS3Bucket}"
+              - !Sub "arn:aws:s3:::${IngestS3Bucket}/*"
           Version: '2012-10-17'
-        PolicyName: AWSLambda-S3-Access
+        PolicyName:
+          Fn::Sub: ${AWS::StackName}-${AWS::Region}-AWSLambda-S3-Access
       - PolicyDocument:
           Statement:
           - Action:
@@ -63,47 +69,19 @@ Resources:
           Fn::Sub: ${AWS::StackName}-${AWS::Region}-AWSLambda-SecretAccess
       RoleName: 
         Fn::Sub: ${AWS::StackName}-${AWS::Region}-AWSLambdaExecutionRole
-    
-
-
- 
+  
   SecretManager:
     Type: AWS::SecretsManager::Secret
     Properties:
       Description: API key to access ingestion data
-      Name: "apiKey"
-      #{"rapidKey":"4cf5e99290mshec3101ac8d0e536p106871jsn5fd1464698a7"}
+      Name: "apiKeyIngest-foundary-prd"
       SecretString: !Join ["", ["{\"","rapidapiKey",  "\":","\"",!Ref apiKey,"\"}"]]
   
-  ScheduledRule: 
-    Type: AWS::Events::Rule
-    DependsOn: Lambda
-    Properties: 
-      ScheduleExpression: cron(0 * * * *)
-      State: "ENABLED"
-      Targets: 
-        - Arn: 
-            Fn::GetAtt: 
-              - Lambda
-              - Arn
-          Id: "TargetFunctionV1"
-  PermissionForEventsToInvokeLambda: 
-    Type: AWS::Lambda::Permission
-    Properties: 
-      FunctionName: !GetAtt Lambda.FunctionName
-      Action: "lambda:InvokeFunction"
-      Principal: "events.amazonaws.com"
-      SourceArn: 
-        Fn::GetAtt: 
-          - ScheduledRule
-          - Arn
-
-
   Lambda:
     Type: AWS::Lambda::Function
     Properties:
       Description: "Function to ingest data from api"
-      FunctionName: IngestionAPI
+      FunctionName: IngestionAPIFoundary-prd
       Handler: function.ingest
       Code: 
         ZipFile: |
@@ -111,17 +89,19 @@ Resources:
           def lambda_handler(event,context):
             return {'statuscode':200,'body':json.dumps('Hello from lambda!')}
   
-      Role:
-        Fn::GetAtt:
-          - IAMRole
-          - 'Arn'
+      Role: !GetAtt MyLambdaFunctionRoleFoundaryPrd.Arn
       Runtime: python3.9 
       Layers: 
         - arn:aws:lambda:ap-southeast-2:336392948345:layer:AWSSDKPandas-Python39:6
       Timeout: 10
-    
-
-    
-      
-
-
+  
+  Schedulerfunction:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: IngestionTriggerFoundaryPrd
+      Description: "To Schedule the ingestion lambda function"
+      ScheduleExpression: "cron(0 * * * ? *)"
+      State: "ENABLED"
+      Targets: 
+         - Arn: !GetAtt Lambda.Arn
+           Id: "LambdaTarget"
