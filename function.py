@@ -8,7 +8,7 @@ import io
 
 
 def get_secret():
-    secret_name = 'apiKey'
+    secret_name = 'apiKeyIngest'
     region_name = 'ap-southeast-2'
 
     #create a secret manager client

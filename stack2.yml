@@ -71,7 +71,7 @@ Resources:
     Type: AWS::SecretsManager::Secret
     Properties:
       Description: API key to access ingestion data
-      Name: "apiKey"
+      Name: "apiKeyIngest"
       SecretString: !Join ["", ["{\"","rapidapiKey",  "\":","\"",!Ref apiKey,"\"}"]]
   
   Lambda:
