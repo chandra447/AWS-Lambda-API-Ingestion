@@ -1,12 +1,14 @@
-- [function.py](#functionpy)
-- [stack.yml](#stackyml)
-    - [Hardcorded Values ](#hardcorded-values-)
-  - [Parameters for cloudFormation Template](#parameters-for-cloudformation-template)
-- [workflows/main.yml](#workflowsmainyml)
-  - [Usage of main.yml](#usage-of-mainyml)
+- [AWS-Lambda-API-Ingestion](#aws-lambda-api-ingestion)
+    - [function.py](#functionpy)
+    - [stack.yml](#stackyml)
+        - [Hardcorded Values ](#hardcorded-values-)
+      - [Parameters for cloudFormation Template](#parameters-for-cloudformation-template)
+    - [workflows/main.yml](#workflowsmainyml)
+      - [Usage of main.yml](#usage-of-mainyml)
 
 
-
+# AWS-Lambda-API-Ingestion
+This Repository demonstrates ingestion of any API in AWS and trigger the Lambda Function
 
 ### function.py
 Python function retrives the secrets stored in the secretManager for the weather API<br>
