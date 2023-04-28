@@ -9,6 +9,7 @@
 
 # AWS-Lambda-API-Ingestion
 This Repository demonstrates ingestion of any API in AWS and trigger the Lambda Function
+![Resource](Assets/Resources.png)
 
 ### function.py
 Python function retrives the secrets stored in the secretManager for the weather API<br>
