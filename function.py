@@ -36,7 +36,7 @@ def file_exists(bucketName,path):
 
 def ingest(x,y):
     
-    bucket_name = 'landing'
+    bucket_name = 'staging-bucket-foundary'
     today = dt.date.today()
     year = today.year
     month = today.month
