@@ -5,13 +5,17 @@ Parameters:
     NoEcho: true
     Description: API secret
     Type: String
-  
 
 #Define the Required Resources
 #1.Creating the required S3 Bucket
 Resources:            
     #aws lambda role to access s3 bucket and secrets
-  MyLambdaFunctionRole:
+  IngestS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: ingest-bucket-foundary
+
+  MyLambdaFunctionRoleFoundary:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -45,10 +49,11 @@ Resources:
             - s3:GetObject
             Effect: Allow
             Resource:
-              - arn:aws:s3:::staging-bucket-foundary
-              - arn:aws:s3:::staging-bucket-foundary/*
+              - !Sub "arn:aws:s3:::${IngestS3Bucket}"
+              - !Sub "arn:aws:s3:::${IngestS3Bucket}/*"
           Version: '2012-10-17'
-        PolicyName: AWSLambda-S3-Access
+        PolicyName:
+          Fn::Sub: ${AWS::StackName}-${AWS::Region}-AWSLambda-S3-Access
       - PolicyDocument:
           Statement:
           - Action:
@@ -64,22 +69,19 @@ Resources:
           Fn::Sub: ${AWS::StackName}-${AWS::Region}-AWSLambda-SecretAccess
       RoleName: 
         Fn::Sub: ${AWS::StackName}-${AWS::Region}-AWSLambdaExecutionRole
-    
-
-
- 
+  
   SecretManager:
     Type: AWS::SecretsManager::Secret
     Properties:
       Description: API key to access ingestion data
-      Name: "apiKeyIngest"
+      Name: "apiKeyIngest-foundary"
       SecretString: !Join ["", ["{\"","rapidapiKey",  "\":","\"",!Ref apiKey,"\"}"]]
   
   Lambda:
     Type: AWS::Lambda::Function
     Properties:
       Description: "Function to ingest data from api"
-      FunctionName: IngestionAPITest56
+      FunctionName: IngestionAPIFoundary
       Handler: function.ingest
       Code: 
         ZipFile: |
@@ -87,14 +89,19 @@ Resources:
           def lambda_handler(event,context):
             return {'statuscode':200,'body':json.dumps('Hello from lambda!')}
   
-      Role: !GetAtt MyLambdaFunctionRole.Arn
+      Role: !GetAtt MyLambdaFunctionRoleFoundary.Arn
       Runtime: python3.9 
       Layers: 
         - arn:aws:lambda:ap-southeast-2:336392948345:layer:AWSSDKPandas-Python39:6
       Timeout: 10
-    
-
-    
-      
-
-
+  
+  Schedulerfunction:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: IngestionTriggerFoundary
+      Description: "To Schedule the ingestion lambda function"
+      ScheduleExpression: "cron(0 * * * ? *)"
+      State: "ENABLED"
+      Targets: 
+         - Arn: !GetAtt Lambda.Arn
+           Id: "LambdaTarget"

@@ -8,7 +8,7 @@ import io
 
 
 def get_secret():
-    secret_name = 'apiKeyIngest'
+    secret_name = 'apiKeyIngest-foundary'
     region_name = 'ap-southeast-2'
 
     #create a secret manager client
@@ -36,7 +36,7 @@ def file_exists(bucketName,path):
 
 def ingest(x,y):
     
-    bucket_name = 'staging-bucket-foundary'
+    bucket_name = 'ingest-bucket-foundary'
     today = dt.date.today()
     year = today.year
     month = today.month
